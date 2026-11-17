@@ -1,11 +1,201 @@
-<!doctype html><html lang="sv"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101719"><title>Starship Landing Lab</title></head><body><div id="app">
-<header><a class="brand" href="#"><span class="brand-icon">↗</span> GAMEHAVN <span class="slash">/</span> LABS</a><div class="header-right"><span class="live-dot"></span> LOKAL SIMULERING <span class="version">PoC · 0.1</span></div></header>
-<main><div class="title-row"><div><p class="eyebrow">FLYGTEST 001 / AUTONOM LANDNING</p><h1>Starship <em>Landing Lab</em><span class="period">.</span></h1><p class="intro">Bygg känslan. Trimma autopiloten. Sätt landningen.</p></div><a class="idea-link" href="https://gamehavn.com/ideas/starship-landing-lab" target="_blank" rel="noopener noreferrer">En idé från GameHavn ↗</a></div>
-<div class="workspace"><section class="simulation" aria-label="3D-flygsimulering"><div id="viewport"></div><div class="scene-top"><span><i class="live-dot"></i> <span id="phase">REDO FÖR FLYGTEST</span></span><span class="scene-id">LANDNINGSZON A–01</span></div><div class="scene-side"><span>ALT</span><strong id="altitude">120.0</strong><small>meter</small><div class="alt-rule"></div><span>V/S</span><strong id="velocity">−12.0</strong><small>m/s</small></div><div class="scene-bottom"><span>JORDGRAVITATION <b>9.81 m/s²</b></span><span>DYNAMIK <b>2D · VY 3D</b></span></div><div id="result" class="result" hidden><span id="result-label"></span><h2 id="result-title"></h2><p id="result-text"></p></div><div class="camera-controls"><button id="camera" title="Växla kameravy">◈ Kameravy</button><button id="speed">1× Hastighet</button></div></section>
-<aside><div class="panel-heading"><span class="eyebrow">01 / KONTROLLSYSTEM</span><span class="chip">AUTOPILOT</span></div><h2>Du ställer in.<br>Autopiloten flyger.</h2><p class="panel-intro">Ändra responsen och se vad som händer. Alla tester börjar från samma position.</p>
-<div class="tuning"><label for="brake"><span>Bromsrespons</span><output id="brake-out">1.00</output></label><input id="brake" type="range" min="0" max="2" step="0.05" value="1"><p>Hur snabbt motorn korrigerar fallhastigheten.</p></div>
-<div class="tuning"><label for="stability"><span>Lutningskontroll</span><output id="stability-out">1.00</output></label><input id="stability" type="range" min="0" max="2" step="0.05" value="1"><p>Hur bestämt skeppet håller sig upprätt.</p></div>
-<div class="tuning"><label for="drift"><span>Driftkorrigering</span><output id="drift-out">1.00</output></label><input id="drift" type="range" min="0" max="2" step="0.05" value="1"><p>Hur aktivt skeppet söker landningsplattan.</p></div>
-<label class="wind-label" for="wind"><span>Sidvind</span><select id="wind"><option value="0">Av · lugnt väder</option><option value="0.6">På · 0.6 m/s²</option></select></label><div class="actions"><button id="launch" class="primary">Starta flygtest <span>↗</span></button><button id="reset" class="reset" title="Återställ flygning">↺</button></div><div class="presets"><span>UTGÅNGSLÄGE</span><button id="balanced">Balanserad</button><button id="bad">För lite broms</button></div></aside></div>
-<section class="telemetry"><div class="telemetry-heading"><span class="eyebrow">02 / FLYGDATA</span><span id="test-status">Väntar på första testet</span><button id="export">↓ Exportera CSV</button></div><div class="data-grid"><div class="metric"><span>SIDOAVSTÅND</span><strong id="offset">35.0 <small>m</small></strong><p>Mål: inom ±6 m</p></div><div class="metric"><span>LUTNING</span><strong id="tilt">8.6 <small>°</small></strong><p>Mål: högst ±8°</p></div><div class="metric"><span>MOTORPÅDRAG</span><strong id="throttle">0 <small>%</small></strong><div class="meter"><div id="throttle-bar"></div></div></div><div class="metric"><span>BRÄNSLE</span><strong id="fuel">100 <small>%</small></strong><div class="meter"><div id="fuel-bar"></div></div></div><div class="chart-wrap"><span>FALLHASTIGHET / TID</span><canvas id="chart" width="540" height="120" aria-label="Graf över fallhastighet" role="img"></canvas><div class="chart-key"><i></i> Vertikal hastighet <span id="clock">T+ 00.0 s</span></div></div></div><div class="feedback"><span>↳</span><p id="feedback">Målet: under 3 m/s nedåt, under 2 m/s sidledes, högst 8° lutning och inom 6 m från mitten.</p></div><div id="history" aria-live="polite"></div></section>
-<footer><span>ETT LITET EXPERIMENT. EN STOR LANDNING.</span><span>Three.js <b>·</b> Förenklad fysik <b>·</b> Inga externa bildresurser</span></footer></main></div><script type="module" src="/src/main.js"></script></body></html>
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101719" />
+    <title>Starship Landing Lab</title>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <a class="brand" href="#"
+          ><span class="brand-icon">↗</span> GAMEHAVN
+          <span class="slash">/</span> LABS</a
+        >
+        <div class="header-right">
+          <span class="live-dot"></span> LOKAL SIMULERING
+          <span class="version">PoC · 0.1</span>
+        </div>
+      </header>
+      <main>
+        <div class="title-row">
+          <div>
+            <p class="eyebrow">FLYGTEST 001 / AUTONOM LANDNING</p>
+            <h1>Starship <em>Landing Lab</em><span class="period">.</span></h1>
+            <p class="intro">
+              Bygg känslan. Trimma autopiloten. Sätt landningen.
+            </p>
+          </div>
+          <a
+            class="idea-link"
+            href="https://gamehavn.com/ideas/starship-landing-lab"
+            target="_blank"
+            rel="noopener noreferrer"
+            >En idé från GameHavn ↗</a
+          >
+        </div>
+        <div class="workspace">
+          <section class="simulation" aria-label="3D-flygsimulering">
+            <div id="viewport"></div>
+            <div class="scene-top">
+              <span
+                ><i class="live-dot"></i>
+                <span id="phase">REDO FÖR FLYGTEST</span></span
+              ><span class="scene-id">LANDNINGSZON A–01</span>
+            </div>
+            <div class="scene-side">
+              <span>ALT</span><strong id="altitude">120.0</strong
+              ><small>meter</small>
+              <div class="alt-rule"></div>
+              <span>V/S</span><strong id="velocity">−12.0</strong
+              ><small>m/s</small>
+            </div>
+            <div class="scene-bottom">
+              <span>JORDGRAVITATION <b>9.81 m/s²</b></span
+              ><span>DYNAMIK <b>2D · VY 3D</b></span>
+            </div>
+            <div id="result" class="result" hidden>
+              <span id="result-label"></span>
+              <h2 id="result-title"></h2>
+              <p id="result-text"></p>
+            </div>
+            <div class="camera-controls">
+              <button id="camera" title="Växla kameravy">◈ Kameravy</button
+              ><button id="speed">1× Hastighet</button>
+            </div>
+          </section>
+          <aside>
+            <div class="panel-heading">
+              <span class="eyebrow">01 / KONTROLLSYSTEM</span
+              ><span class="chip">AUTOPILOT</span>
+            </div>
+            <h2>Du ställer in.<br />Autopiloten flyger.</h2>
+            <p class="panel-intro">
+              Ändra responsen och se vad som händer. Alla tester börjar från
+              samma position.
+            </p>
+            <div class="tuning">
+              <label for="brake"
+                ><span>Bromsrespons</span
+                ><output id="brake-out">1.00</output></label
+              ><input
+                id="brake"
+                type="range"
+                min="0"
+                max="2"
+                step="0.05"
+                value="1"
+              />
+              <p>Hur snabbt motorn korrigerar fallhastigheten.</p>
+            </div>
+            <div class="tuning">
+              <label for="stability"
+                ><span>Lutningskontroll</span
+                ><output id="stability-out">1.00</output></label
+              ><input
+                id="stability"
+                type="range"
+                min="0"
+                max="2"
+                step="0.05"
+                value="1"
+              />
+              <p>Hur bestämt skeppet håller sig upprätt.</p>
+            </div>
+            <div class="tuning">
+              <label for="drift"
+                ><span>Driftkorrigering</span
+                ><output id="drift-out">1.00</output></label
+              ><input
+                id="drift"
+                type="range"
+                min="0"
+                max="2"
+                step="0.05"
+                value="1"
+              />
+              <p>Hur aktivt skeppet söker landningsplattan.</p>
+            </div>
+            <label class="wind-label" for="wind"
+              ><span>Sidvind</span
+              ><select id="wind">
+                <option value="0">Av · lugnt väder</option>
+                <option value="0.6">På · 0.6 m/s²</option>
+              </select></label
+            >
+            <div class="actions">
+              <button id="launch" class="primary">
+                Starta flygtest <span>↗</span></button
+              ><button id="reset" class="reset" title="Återställ flygning">
+                ↺
+              </button>
+            </div>
+            <div class="presets">
+              <span>UTGÅNGSLÄGE</span><button id="balanced">Balanserad</button
+              ><button id="bad">För lite broms</button>
+            </div>
+          </aside>
+        </div>
+        <section class="telemetry">
+          <div class="telemetry-heading">
+            <span class="eyebrow">02 / FLYGDATA</span
+            ><span id="test-status">Väntar på första testet</span
+            ><button id="export">↓ Exportera CSV</button>
+          </div>
+          <div class="data-grid">
+            <div class="metric">
+              <span>SIDOAVSTÅND</span
+              ><strong id="offset">35.0 <small>m</small></strong>
+              <p>Mål: inom ±6 m</p>
+            </div>
+            <div class="metric">
+              <span>LUTNING</span
+              ><strong id="tilt">8.6 <small>°</small></strong>
+              <p>Mål: högst ±8°</p>
+            </div>
+            <div class="metric">
+              <span>MOTORPÅDRAG</span
+              ><strong id="throttle">0 <small>%</small></strong>
+              <div class="meter"><div id="throttle-bar"></div></div>
+            </div>
+            <div class="metric">
+              <span>BRÄNSLE</span
+              ><strong id="fuel">100 <small>%</small></strong>
+              <div class="meter"><div id="fuel-bar"></div></div>
+            </div>
+            <div class="chart-wrap">
+              <span>FALLHASTIGHET / TID</span
+              ><canvas
+                id="chart"
+                width="540"
+                height="120"
+                aria-label="Graf över fallhastighet"
+                role="img"
+              ></canvas>
+              <div class="chart-key">
+                <i></i> Vertikal hastighet <span id="clock">T+ 00.0 s</span>
+              </div>
+            </div>
+          </div>
+          <div class="feedback">
+            <span>↳</span>
+            <p id="feedback">
+              Målet: under 3 m/s nedåt, under 2 m/s sidledes, högst 8° lutning
+              och inom 6 m från mitten.
+            </p>
+          </div>
+          <div id="history" aria-live="polite"></div>
+        </section>
+        <footer>
+          <span>ETT LITET EXPERIMENT. EN STOR LANDNING.</span
+          ><span
+            >Three.js <b>·</b> Förenklad fysik <b>·</b> Inga externa
+            bildresurser</span
+          >
+        </footer>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
